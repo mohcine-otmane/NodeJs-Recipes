@@ -175,6 +175,17 @@ NodeJs-Recipes/
 │   ├── server.js
 │   └── package.json
 ├── FileUpload/
+│   ├── public/
+│   │   ├── index.html
+│   │   └── styles.css
+│   ├── uploads/
+│   │   ├── images/
+│   │   ├── videos/
+│   │   ├── pdfs/
+│   │   └── others/
+│   ├── server.js
+│   ├── package.json
+│   └── .env
 ├── RESTAPI/
 ├── WebSocketChat/
 ├── EmailService/
