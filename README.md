@@ -283,6 +283,14 @@ NodeJs-Recipes/
 │   ├── package.json
 │   └── .env
 ├── EmailService/
+│   ├── public/
+│   │   ├── index.html
+│   │   └── styles.css
+│   ├── templates/
+│   │   └── welcome.hbs
+│   ├── server.js
+│   ├── package.json
+│   └── .env
 ├── WebSocketChat/
 ├── RESTAPI/
 ├── PaymentIntegration/

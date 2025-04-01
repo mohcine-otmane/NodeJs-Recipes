@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Service</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .server-status {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .server-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .server-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Email Service</h1>
+        <div id="status" class="status"></div>
+        
+        <form id="emailForm" class="email-form">
+            <div class="form-group">
+                <label for="to">To:</label>
+                <input type="email" id="to" name="to" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="template">Template:</label>
+                <select id="template" name="template" required>
+                    <option value="">Select a template</option>
+                    <option value="welcome">Welcome Email</option>
+                    <option value="love">Love Letter</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">Send Email</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('emailForm');
+        const status = document.getElementById('status');
+        const templateSelect = document.getElementById('template');
+
+        // Check server status
+        async function checkStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/health');
+                const data = await response.json();
+                status.textContent = 'Server is running';
+                status.className = 'status success';
+            } catch (error) {
+                status.textContent = 'Server is not running';
+                status.className = 'status error';
+            }
+        }
+
+        // Check status every 5 seconds
+        checkStatus();
+        setInterval(checkStatus, 5000);
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                to: document.getElementById('to').value,
+                subject: document.getElementById('subject').value,
+                template: document.getElementById('template').value,
+                data: {
+                    name: document.getElementById('name').value
+                }
+            };
+
+            try {
+                console.log('Sending email request:', formData);
+                const response = await fetch('http://localhost:3000/api/send-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    status.textContent = 'Email queued successfully!';
+                    status.className = 'status success';
+                    form.reset();
+                } else {
+                    throw new Error(data.error || 'Failed to send email');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                status.textContent = `Error: ${error.message}`;
+                status.className = 'status error';
+            }
+        });
+    </script>
+</body>
+</html> 
